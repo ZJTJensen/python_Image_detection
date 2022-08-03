@@ -21,6 +21,9 @@ humanDetected = False
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 displayImages=[]
 
+new_im = Image.open('./imgs/logo.png')
+new_im.save('numToDisplay.png', 'PNG')
+
 def decide_IMG():
     global chosenRange
     chosenNum = str(randint(1, int(chosenRange)))
@@ -122,6 +125,8 @@ while cap.isOpened():
     cv2.imshow('Webcam', img_rgb)
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        new_im = Image.open('./imgs/logo.png')
+        new_im.save('numToDisplay.png', 'PNG')
         displayImages=[];
         hasSelected = False
         humanDetected = False
