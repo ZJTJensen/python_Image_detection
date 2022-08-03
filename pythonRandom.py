@@ -3,9 +3,7 @@ import numpy as np
 from random import randint
 import imutils 
 import cv2
-from matplotlib import pyplot as plt
 import threading
-import pynput.keyboard
 
 frame_count = 0
 chosenRange = 20
@@ -20,7 +18,6 @@ hog = cv2.HOGDescriptor()
 humanDetected = False
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 displayImages=[]
-
 new_im = Image.open('./imgs/logo.png')
 new_im.save('numToDisplay.png', 'PNG')
 
@@ -38,7 +35,6 @@ def decide_IMG():
         widths, heights = zip(*(i.size for i in images))
         total_width = sum(widths)
         max_height = max(heights)
-
         new_im = Image.new('RGBA', (total_width, max_height))
         x_offset = 0
         for im in images:
@@ -66,7 +62,6 @@ def humanDetector(image, width, height):
                                         winStride=(5, 5), 
                                         padding=(3, 3), 
                                         scale=1.21)
-        
         if (len(humans)> 0):
             return True
     old_frame = image
@@ -77,7 +72,6 @@ def determineRun():
     global hasSelected
     global displayImages
     global humanDetected
-
     noFunctionCalls = True
     if displayImages == [] and not humanDetected:
         hasSelected = True
@@ -85,29 +79,24 @@ def determineRun():
     elif displayImages == []:
         humanDetected = False
 
-
 while cap.isOpened():
     frame_count += 1
     ret, frame = cap.read()
     img_rgb = cv2.cvtColor(frame, code=cv2.COLOR_BGR2RGB)
-
     if((frame_count % 2) == 0):
       prepared_frame = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
       prepared_frame = cv2.GaussianBlur(src=prepared_frame, ksize=(5,5), sigmaX=0)
-
     if (previous_frame is None):
         previous_frame = prepared_frame
         continue
-
     diff_frame = cv2.absdiff(src1=previous_frame, src2=prepared_frame)
     previous_frame = prepared_frame
     kernel = np.ones((5, 5))
     diff_frame = cv2.dilate(diff_frame, kernel, 1)
     thresh_frame = cv2.threshold(src=diff_frame, thresh=20, maxval=255, type=cv2.THRESH_BINARY)[1]
     contours, _ = cv2.findContours(image=thresh_frame, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
-   
     for contour in contours:
-        if (cv2.contourArea(contour) < 1000):
+        if (cv2.contourArea(contour) < 10000):
             if not hasSelected and not humanDetected:
                 cap.get(cv2.CAP_PROP_FRAME_WIDTH)
                 humanDetected = humanDetector(
@@ -123,14 +112,12 @@ while cap.isOpened():
         (x, y, w, h) = cv2.boundingRect(contour)
         cv2.rectangle(img=img_rgb, pt1=(x, y), pt2=(x + w, y + h), color=(0, 255, 0), thickness=1)
     cv2.imshow('Webcam', img_rgb)
-    
     if cv2.waitKey(1) & 0xFF == ord('q'):
         new_im = Image.open('./imgs/logo.png')
         new_im.save('numToDisplay.png', 'PNG')
         displayImages=[];
         hasSelected = False
         humanDetected = False
-
 
     # TODO: ADD THIS AND FIX
     # elif cv2.waitKey(1) & 0xFF == ord('r'):
@@ -156,7 +143,6 @@ while cap.isOpened():
     #     displayImages=[];
     #     hasSelected = False
     #     chosenRange='8'
-
 
 cap.release()
 cv2.destroyAllWindows()
