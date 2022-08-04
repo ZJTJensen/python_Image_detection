@@ -41,11 +41,11 @@ def decide_IMG():
             new_im.paste(im, (x_offset,0))
             x_offset += im.size[0]
         new_im.save('numToDisplay.png', 'PNG')
-        new_im.show();
+        # new_im.show();
     else: 
         new_im = Image.open('./imgs/'+ chosenNum +'.png')
         new_im.save('numToDisplay.png', 'PNG')
-        new_im.show()
+        # new_im.show()
 
 def humanDetector(image, width, height):
     global hog
